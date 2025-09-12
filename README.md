@@ -15,7 +15,16 @@ npm run dev
 npm run build
 ```
 
-The static site will be output to the `dist` directory. Upload the contents of that folder to your web host (e.g. an IONOS subdomain).
+The static site will be generated in the `docs` directory and includes a `CNAME` file for your custom domain.
+
+## Deploy to GitHub Pages
+
+1. Commit the generated `docs` folder to the `main` branch and push it to GitHub.
+2. In the repository settings, enable **Pages** with source set to `main` and folder `docs`.
+3. Add your subdomain as a CNAME record in the IONOS DNS panel pointing to `<your‑github‑username>.github.io`.
+4. Back in GitHub settings, set the custom domain to your subdomain and enforce HTTPS.
+
+After DNS propagation, your site will be served from the IONOS subdomain.
 
 ## Testing
 
