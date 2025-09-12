@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { formatCountdown } from './countdown';
 
 /**
  * Candidate Challenge Page (fixed JSX, with runtime self-checks)
@@ -12,21 +11,18 @@ import { formatCountdown } from './countdown';
 
 type Section = { id: string; label: string };
 
-// Navigation tabs used throughout the page. Defined outside the component so
-// they aren't recreated on every render, keeping hooks stable and effects from
-// re-running needlessly.
-const sections: Section[] = [
-  { id: 'tab-overview', label: 'Overview' },
-  { id: 'tab-task', label: 'Aufgabe' },
-  { id: 'tab-working', label: 'Während der Vorbereitung' },
-  { id: 'tab-pitch', label: 'Was du vorstellen sollst' },
-  { id: 'tab-materials', label: 'Materialien' },
-  { id: 'tab-about', label: 'Über uns' },
-  { id: 'tab-faq', label: 'FAQ' },
-  { id: 'tab-contact', label: 'Kontakt' },
-];
+export default function CandidateChallengePage() {
+  const sections: Section[] = [
+    { id: 'tab-overview', label: 'Overview' },
+    { id: 'tab-task', label: 'Aufgabe' },
+    { id: 'tab-working', label: 'Während der Vorbereitung' },
+    { id: 'tab-pitch', label: 'Was du vorstellen sollst' },
+    { id: 'tab-materials', label: 'Materialien' },
+    { id: 'tab-about', label: 'Über uns' },
+    { id: 'tab-faq', label: 'FAQ' },
+    { id: 'tab-contact', label: 'Kontakt' },
+  ];
 
-export default function App() {
   const activeBg = 'bg-[#77BE21]';
   const activeText = 'text-[#F3EEE7]';
 
@@ -55,16 +51,19 @@ export default function App() {
     return () => obs.disconnect();
   }, []);
 
-  // Countdown to 14:45 (rolls to next day if necessary)
+  // Countdown to 14:45 (today, local time)
   useEffect(() => {
+    const pad = (n: number) => String(n).padStart(2, '0');
     const tick = () => {
-      const next = formatCountdown(new Date());
-      setCountdown(next);
-
-      // Lightweight runtime check for HH:MM:SS format (dev only)
-      const reTime = /^\d{2}:\d{2}:\d{2}$/;
-      // eslint-disable-next-line no-console
-      console.assert(reTime.test(next), '[SelfCheck] Countdown format should be HH:MM:SS');
+      const now = new Date();
+      const target = new Date();
+      target.setHours(14, 45, 0, 0);
+      let diff = target.getTime() - now.getTime();
+      if (diff < 0) diff = 0;
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setCountdown(`${pad(h)}:${pad(m)}:${pad(s)}`);
     };
     tick();
     const id = window.setInterval(tick, 1000);
@@ -83,7 +82,11 @@ export default function App() {
       // eslint-disable-next-line no-console
       console.assert(!!document.getElementById(id), `[SelfCheck] Missing section #${id}`);
     });
-  }, []);
+
+    const reTime = /^\d{2}:\d{2}:\d{2}$/;
+    // eslint-disable-next-line no-console
+    console.assert(reTime.test(countdown), '[SelfCheck] Countdown format should be HH:MM:SS');
+  }, [countdown, sections]);
 
   const navClasses = (id: string) =>
     `block rounded-xl border border-[#04252B]/10 p-4 hover:shadow transition ${
@@ -394,3 +397,4 @@ export default function App() {
     </div>
   );
 }
+
